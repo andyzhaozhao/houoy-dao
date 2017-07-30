@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 /**
- * Created by zhaohl on 2017/5/31.
+ * Created by on 2017/5/31.
  */
 //@Configuration
 //@MapperScan(basePackages="org.citic.iiot.persist.mapper")

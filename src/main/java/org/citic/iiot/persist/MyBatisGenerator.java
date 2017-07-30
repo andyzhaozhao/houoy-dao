@@ -5,7 +5,7 @@ import org.citic.iiot.persist.gener.GeneratorContext;
 import org.citic.iiot.persist.gener.Parameter;
 
 /**
- * Created by zhaohl on 2017/5/31.
+ * Created by zhaozhao on 2017/5/31.
  */
 public class MyBatisGenerator {
 
