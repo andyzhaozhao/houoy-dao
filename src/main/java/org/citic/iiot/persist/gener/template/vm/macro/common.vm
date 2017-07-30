@@ -1,0 +1,47 @@
+## define domain macro.
+## domain property.
+#macro( property $column )
+    private $column.javaType $column.propertyName;
+#end
+## domain method.
+#macro( method $column )
+    #set($methodName= $column.methodName)
+    
+    public $column.javaType get${methodName}() {
+        return this.${column.propertyName};
+    }
+
+    public $domain.className() set${methodName}($column.javaType $column.propertyName) {
+        this.${column.propertyName} = $column.propertyName;
+        return this;
+    }
+#end
+## dao constructor. 
+#macro( constructor $className $sqlSessionTemplateName )
+    @Autowired
+    public ${className}(SqlSessionTemplate sqlSessionTemplate){
+        super(sqlSessionTemplate);
+    }
+#end
+## define mapper macro.
+## mapper autoIncrement.
+#macro( autoIncrement )
+    #foreach($column in $columnList)
+        #if(${column.isPK()} && ${column.isAutoIncrement()})
+            #set($primaryKeyName = $column.propertyName)
+            useGeneratedKeys="true" keyProperty="$!{primaryKeyName}"
+        #end
+    #end
+#end
+## mapper where. 
+#macro( where ) 
+    <trim prefix="WHERE" prefixOverrides="AND">   
+    #foreach($column in $columnList)
+        #if($column.isPK())
+        AND $column.columnName = #{${column.propertyName}}
+        #end
+    #end
+    </trim>
+#end
+## mapper primaryKey. 
+#macro( primaryKey )#foreach($column in $columnList)#if($column.isPK())$column.columnName#end#end#end

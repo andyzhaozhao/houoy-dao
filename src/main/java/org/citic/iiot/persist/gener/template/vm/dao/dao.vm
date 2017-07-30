@@ -1,0 +1,16 @@
+#parse("org/citic/iiot/persist/gener/template/vm/macro/common.vm")
+package ${daoPackage};
+
+import org.citic.iiot.persist.dao.MapperDaoTemplate;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import ${domainPackage}.${domain.className()};
+
+#set($daoClassName = "${domain.className()}Dao")
+@Repository
+public class $daoClassName extends MapperDaoTemplate<${domain.className()}> {
+
+#constructor($daoClassName,$sqlSessionTemplateName)
+
+}

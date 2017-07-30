@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#parse("org/citic/iiot/persist/gener/template/vm/macro/common.vm")
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${mapperName}">
+    
+    <!-- mapper sql columns -->
+    <sql id="${tableDomainName}Columns">
+	#foreach($column in $columnList)
+	    ${mapper.table}.${column.columnName} AS ${mapper.table}_${column.columnName}#if($velocityCount != ${columnList.size()}), #end
+    #end
+    </sql>
+    
+    <!-- mapper sql where -->
+    <sql id="${tableDomainName}Where">
+        <trim prefix="WHERE" prefixOverrides="AND">
+	    #foreach($column in $columnList)
+		    #set($columnCompareValue = $mapper.compareValue($column.javaType))
+            <if test="${column.propertyName}!=$columnCompareValue"> 
+	            AND ${mapper.table}.${column.columnName} = #{${column.propertyName}} 
+	        </if>
+		#end
+	    </trim>
+    </sql>  
+    
+    <!-- mapper sql order -->
+    <sql id="${tableDomainName}Order">
+        <if test="orderString!=null"> ORDER BY ${orderString} </if>
+    </sql>
+    
+    <!-- mapper sql limit -->
+    <sql id="${tableDomainName}Limit">
+        LIMIT #{startLine},#{limitLine}
+    </sql>
+    
+    <!-- mapper sql resultMap -->
+    <resultMap type="${domainPackage}.${domain.className()}" id="${tableDomainName}ResultMap">
+    #foreach($column in $columnList)
+        #if($column.isPK())
+        <id column="${mapper.table}_${column.columnName}" property="$column.propertyName" />                        
+        #end
+    #end   
+    #foreach($column in $columnList)
+        #if(!$column.isPK())
+        <result column="${mapper.table}_${column.columnName}" property="$column.propertyName" />
+        #end
+    #end        
+    </resultMap>
+    
+    <!-- mapper sql find select -->
+    <select id="findDao" resultMap="${tableDomainName}ResultMap">
+        SELECT
+        <include refid="${tableDomainName}Columns"/>
+		FROM $mapper.table
+        <include refid="${tableDomainName}Where"/>
+        <include refid="${tableDomainName}Order"/>
+    </select>
+    
+    <!-- mapper sql count select -->
+    <select id="countDao" resultType="int">
+        SELECT COUNT(*) FROM $mapper.table
+        <include refid="${tableDomainName}Where"/>
+    </select>
+    
+    <!-- mapper sql pagination select -->
+    <select id="pageDao" resultMap="${tableDomainName}ResultMap">
+        SELECT
+        <include refid="${tableDomainName}Columns"/>
+		FROM $mapper.table
+        <include refid="${tableDomainName}Where"/>
+        <include refid="${tableDomainName}Order"/>
+        <include refid="${tableDomainName}Limit"/>
+    </select>
+    
+    <!-- mapper sql limit select -->
+    <select id="limitDao" resultMap="${tableDomainName}ResultMap">
+        SELECT
+        <include refid="${tableDomainName}Columns"/>
+		FROM $mapper.table
+        <include refid="${tableDomainName}Where"/>
+        <include refid="${tableDomainName}Order"/>
+        <include refid="${tableDomainName}Limit"/>
+    </select>
+    
+    <!-- mapper sql insert -->
+    <insert id="saveDao" #autoIncrement()>
+        INSERT INTO $mapper.table 
+        <trim prefix="(" prefixOverrides=",">
+		#foreach($column in $columnList)
+		    #set($columnCompareValue = $mapper.compareValue($column.javaType))
+            <if test="${column.propertyName}!=$columnCompareValue"> ,$column.columnName </if>
+		#end
+		</trim>) 
+	    VALUES
+	    <trim prefix="(" prefixOverrides=",">
+    	#foreach($column in $columnList)
+    	    #set($columnCompareValue = $mapper.compareValue($column.javaType))
+            <if test="${column.propertyName}!=$columnCompareValue"> ,#{${column.propertyName}} </if>
+    	#end
+    	</trim>)
+    </insert>
+    
+    <!-- mapper sql update -->
+    <update id="updateDao">
+        UPDATE $mapper.table
+        <trim prefix="SET" prefixOverrides=",">
+	    #foreach($column in $columnList)
+	        #set($columnCompareValue = $mapper.compareValue($column.javaType))
+    	    <if test="${column.propertyName}!=$columnCompareValue"> ,$column.columnName = #{${column.propertyName}} </if>
+		#end
+		</trim>
+		#where()
+	</update>
+	
+	<!-- mapper sql delete -->
+	<delete id="deleteDao">
+        DELETE FROM $mapper.table 
+    	#where()
+    </delete>
+    
+    <!-- mapper sql others -->
+</mapper>

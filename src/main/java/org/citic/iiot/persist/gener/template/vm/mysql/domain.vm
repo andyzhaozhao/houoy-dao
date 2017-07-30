@@ -1,0 +1,19 @@
+#parse("org/citic/iiot/persist/gener/template/vm/macro/common.vm")
+package ${domainPackage};
+
+import java.io.Serializable;
+import org.citic.iiot.persist.domain.PageEntity;
+
+public class $domain.className() extends PageEntity implements Serializable {
+
+#if($!{serialVersionUID})
+    private static final long serialVersionUID = $!{serialVersionUID}L;
+#end
+## domain object property.
+#foreach($column in $columnList)#property($column)#end
+## domain object method.
+#foreach($column in $columnList)
+    #method($column)
+#end
+
+}
